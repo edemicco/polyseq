@@ -1,0 +1,7 @@
+{
+  "name": "polyseq",
+  "short_name": "polyseq",
+  "description": "Polymer Sequencer",
+  "start_url": "/",
+  "display": "standalone"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "polyseq",
+  "description": "Polymer Sequencer",
+  "dependencies": {
+    "@material/mwc-checkbox": "^0.1.2",
+    "@polymer/lit-element": "^0.5.2",
+    "@polymer/polymer": "^3.0.0"
+  },
+  "devDependencies": {
+    "@webcomponents/webcomponentsjs": "^2.0.2",
+    "wct-browser-legacy": "^1.0.0"
+  }
+}
