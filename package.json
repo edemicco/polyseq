@@ -4,7 +4,10 @@
   "dependencies": {
     "@material/mwc-checkbox": "^0.1.2",
     "@polymer/lit-element": "^0.5.2",
-    "@polymer/polymer": "^3.0.0"
+    "@polymer/polymer": "^3.0.0",
+    "polymer-redux": "^1.0.5",
+    "pwa-helpers": "^0.8.2",
+    "redux": "^4.0.0"
   },
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "^2.0.2",
