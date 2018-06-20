@@ -7,6 +7,8 @@ import {
 import {reduxActions} from './redux-actions';
 
 var initialState = {
+    playing:      false,
+    activeSubdiv: 0,
     bpm:          80,
     beats:        4,
     subdivisions: 2,
@@ -34,15 +36,28 @@ function appReducer (state = initialState, action) {
             };
 
         case reduxActions.TOGGLE_SUBDIVISION:
+            var trackNumber = action.trackNumber;
+            var oldTrack = state.tracks[trackNumber];
+
             // clone tracks array
             var newTracks = state.tracks.slice(0);
-
-            newTracks[action.track].pattern[action.subdivision] = !newTracks[action.track].pattern[action.subdivision];
+            // clone track object
+            newTracks[trackNumber] = Object.assign({}, oldTrack);
+            // clone the track's pattern array
+            newTracks[trackNumber].pattern = oldTrack.pattern.slice(0)
+            // toggle the subdivision
+            newTracks[trackNumber].pattern[action.subdivision] = !oldTrack.pattern[action.subdivision];
 
             return {
                 ...state,
                 tracks: newTracks
-            }
+            };
+
+        case reduxActions.TOGGLE_PLAYBACK:
+            return {
+                ...state,
+                playing: !state.playing
+            };
     }
 
     return state
