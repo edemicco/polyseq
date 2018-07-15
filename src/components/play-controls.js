@@ -8,6 +8,10 @@ class PlayControls extends connect(store)(PolymerElement){
         return {
             playing: {
                 type: Boolean
+            },
+            playStopButtonLabel: {
+                type: String,
+                computed: 'getPlayStopButtonLabel(playing)'
             }
         };
     }
@@ -28,7 +32,7 @@ class PlayControls extends connect(store)(PolymerElement){
               }
             </style>
             
-            <button on-click="togglePlayback">{{getPlayStopButtonLabel()}}</button>
+            <button on-click="togglePlayback">{{playStopButtonLabel}}</button>
         `;
     }
 
@@ -36,8 +40,8 @@ class PlayControls extends connect(store)(PolymerElement){
         this.playing = state.playing;
     }
 
-    getPlayStopButtonLabel() {
-        return this.playing ? 'Stop' : 'Play';
+    getPlayStopButtonLabel(playing) {
+        return playing ? 'Stop' : 'Play';
     }
 
     togglePlayback() {

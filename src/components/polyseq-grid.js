@@ -16,6 +16,10 @@ class PolyseqGrid extends connect(store)(PolymerElement){
             },
             playing: {
                 type: Boolean
+            },
+            localTracks: {
+                type: Array,
+                computed: 'createLocalTrackArray(tracks, activeSubdiv, playing)'
             }
         }
         ;
@@ -47,12 +51,12 @@ class PolyseqGrid extends connect(store)(PolymerElement){
               }
             </style>
             
-            <template is='dom-repeat' items="{{tracks}}" index-as="tracksIdx">
+            <template is='dom-repeat' items="{{localTracks}}" index-as="tracksIdx">
                 <div>
                     <span>{{item.sound}}</span>
-                    <template is='dom-repeat' items="{{item.pattern}}" as="playThisDiv">
-                        <span class$="subdivision-box [[getCssClass(playThisDiv, index)]]">
-                            <mwc-checkbox checked="{{playThisDiv}}" value='{{tracksIdx}}:{{index}}' on-click="selectSubdivision"></mwc-checkbox>
+                    <template is='dom-repeat' items="{{item.pattern}}" as="subdiv">
+                        <span class$="subdivision-box [[getCssClass(subdiv)]]">
+                            <mwc-checkbox checked="{{subdiv.play}}" value='{{tracksIdx}}:{{index}}' on-click="selectSubdivision"></mwc-checkbox>
                         </span>
                     </template>
                 </div>
@@ -68,8 +72,19 @@ class PolyseqGrid extends connect(store)(PolymerElement){
         this.playing = state.playing;
     }
 
-    getCssClass(selected, subdiv) {
-        return (selected ? 'selected' : '') + (this.playing && subdiv == this.activeSubdiv ? ' active' : '');
+    createLocalTrackArray(tracks, activeSubdiv, playing) {
+        // create copy of tracks array with
+        return tracks.map(function(track) {
+            return {
+                sound: track.sound,
+                pattern: track.pattern.map((subdiv, index) => ({play: subdiv, active: playing && activeSubdiv === index}))
+            }
+        });
+
+    }
+
+    getCssClass(subdiv) {
+        return (subdiv.play ? 'selected' : '') + (this.playing && subdiv.active ? ' active' : '');
     }
 
     selectSubdivision(event) {
