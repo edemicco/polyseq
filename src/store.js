@@ -1,8 +1,5 @@
 import {
-    createStore,
-    compose as origCompose,
-    applyMiddleware,
-    combineReducers
+    createStore
 } from 'redux';
 import {reduxActions} from './redux-actions';
 
@@ -44,7 +41,7 @@ function appReducer (state = initialState, action) {
             // clone track object
             newTracks[trackNumber] = Object.assign({}, oldTrack);
             // clone the track's pattern array
-            newTracks[trackNumber].pattern = oldTrack.pattern.slice(0)
+            newTracks[trackNumber].pattern = oldTrack.pattern.slice(0);
             // toggle the subdivision
             newTracks[trackNumber].pattern[action.subdivision] = !oldTrack.pattern[action.subdivision];
 
@@ -56,8 +53,19 @@ function appReducer (state = initialState, action) {
         case reduxActions.TOGGLE_PLAYBACK:
             return {
                 ...state,
-                playing: !state.playing
+                playing: !state.playing,
+                activeSubdiv: 0
             };
+
+        case reduxActions.NEXT_TICK:
+            if (state.playing) {
+                return {
+                    ...state,
+                    activeSubdiv: (state.activeSubdiv < ((state.beats * state.subdivisions) - 1)) ? state.activeSubdiv + 1 : 0
+                }
+            } else {
+                return state;
+            }
     }
 
     return state
@@ -65,4 +73,4 @@ function appReducer (state = initialState, action) {
 
 export const store = createStore(appReducer);
 
-window.store = store; // to assist debugging
+window.reduxStore = store; // to assist debugging

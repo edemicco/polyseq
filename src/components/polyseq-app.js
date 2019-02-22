@@ -1,6 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer/polymer-element';
 import {PolyseqGrid} from './polyseq-grid'
 import {PlayControls} from './play-controls'
+import {SoundGenerator} from './sound-generator'
 import {reduxActions} from '../redux-actions';
 import {store} from '../store'
 
@@ -19,6 +20,7 @@ class PolyseqApp extends PolymerElement {
             
             <polyseq-grid></polyseq-grid>
             <play-controls></play-controls>
+            <sound-generator></sound-generator>
         `;
     }
 }
