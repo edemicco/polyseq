@@ -10,11 +10,13 @@ class SoundGenerator extends connect(store)(PolymerElement) {
 
     constructor() {
         super();
-        this.audioElement = document.querySelector('audio');
 
         this.audioContext = new AudioContext();
-        const track = this.audioContext.createMediaElementSource(this.audioElement);
-        track.connect(this.audioContext.destination);
+
+        // Load the sound and decode it into the buffer
+        fetch('assets/samples/cmm-kit/Closed Hat.wav')
+            .then(response => response.arrayBuffer())
+            .then(audioData => this.audioContext.decodeAudioData(audioData, decoded=>this.buffer1=decoded));
     }
 
     static get template() {
@@ -26,8 +28,37 @@ class SoundGenerator extends connect(store)(PolymerElement) {
             if (this.audioContext.state === "suspended")
                 this.audioContext.resume();
 
-            this.audioElement.play();
+            this._scheduleMeasure(this.buffer1, 0, state);
+            var measureLength = (60/state.bpm) * state.beats;
+
+            this._repeatMeasure = window.setInterval(this._scheduleMeasure.bind(this, this.buffer1, 0, state), measureLength * 1000)
+        } else {
+            // TODO: Figure out how to cancel scheduled sounds.
+            window.clearInterval(this._repeatMeasure);
         }
+    }
+
+    // TODO: Figure out how to schedule more frequently than each measure so changes take place immediately
+    // TODO: Don't use currentTime, schedule for a precise time ("event queue")?
+    _scheduleMeasure(buffer, trackNumber, state) {
+        console.log('scheduleMeasure');
+        var subdivisionLength = (60/state.bpm) / state.subdivisions;
+
+        state.tracks[trackNumber].pattern.forEach(function (subdiv, index) {
+            if (subdiv)
+                this._scheduleBuffer(buffer, this.audioContext.currentTime + (index * subdivisionLength));
+        }.bind(this));
+
+        this.measureNumber += 1;
+    }
+
+    _scheduleBuffer(buffer, time) {
+        // Create a new source
+        var source = this.audioContext.createBufferSource();
+
+        source.buffer = buffer;
+        source.connect(this.audioContext.destination);
+        source.start(time);
     }
 }
 
