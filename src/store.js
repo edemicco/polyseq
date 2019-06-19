@@ -53,18 +53,13 @@ function appReducer (state = initialState, action) {
         case reduxActions.TOGGLE_PLAYBACK:
             return {
                 ...state,
-                playing: !state.playing,
-                activeSubdiv: 0
+                playing: !state.playing
             };
 
-        case reduxActions.NEXT_TICK:
-            if (state.playing) {
-                return {
-                    ...state,
-                    activeSubdiv: (state.activeSubdiv < ((state.beats * state.subdivisions) - 1)) ? state.activeSubdiv + 1 : 0
-                }
-            } else {
-                return state;
+        case reduxActions.UPDATE_SUBDIVISION:
+            return {
+                ...state,
+                activeSubdiv: action.subdivision
             }
     }
 
