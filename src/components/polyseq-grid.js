@@ -37,6 +37,12 @@ class PolyseqGrid extends connect(store)(PolymerElement){
                 margin: 1rem;
               }
               
+              .sample-name {
+                display: inline-block;
+                width: 4rem;
+                text-align: right;
+              }
+              
               .subdivision-box {
                 background: lightblue;
                 display: inline-block;
@@ -53,7 +59,7 @@ class PolyseqGrid extends connect(store)(PolymerElement){
             
             <template is='dom-repeat' items="{{localTracks}}" index-as="tracksIdx">
                 <div>
-                    <span>{{item.sound}}</span>
+                    <span class="sample-name">{{item.sample}}</span>
                     <template is='dom-repeat' items="{{item.pattern}}" as="subdiv">
                         <span class$="subdivision-box [[getCssClass(subdiv)]]">
                             <mwc-checkbox checked="{{subdiv.play}}" value='{{tracksIdx}}:{{index}}' on-click="selectSubdivision"></mwc-checkbox>
@@ -76,7 +82,7 @@ class PolyseqGrid extends connect(store)(PolymerElement){
         // create copy of tracks array with
         return tracks.map(function(track) {
             return {
-                sound: track.sound,
+                sample: track.sample,
                 pattern: track.pattern.map((subdiv, index) => ({play: subdiv, active: playing && activeSubdiv === index}))
             }
         });

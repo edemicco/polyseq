@@ -11,7 +11,9 @@ class SoundGenerator extends connect(store)(PolymerElement) {
     constructor() {
         super();
 
-        this.audioContext = new AudioContext();
+        var context = window.AudioContext || window.webkitAudioContext;
+
+        this.audioContext = new context;
 
         this.playing = false;
         this.bpm = 0;
@@ -22,11 +24,8 @@ class SoundGenerator extends connect(store)(PolymerElement) {
         this.playNextNotesAt = 0; // The time, based on the audioContext's currentTime, to play the next note.
         this.uiNeedsUpdate = false;
 
-        // Load the sound and decode it into the buffer
-        // TODO: load the required set of sounds
-        fetch('assets/samples/cmm-kit/Closed Hat.wav')
-            .then(response => response.arrayBuffer())
-            .then(audioData => this.audioContext.decodeAudioData(audioData, decoded=>this.buffer1=decoded));
+        this.sampleBuffers = {};
+        this.loadSamples();
     }
 
     static get template() {
@@ -54,13 +53,29 @@ class SoundGenerator extends connect(store)(PolymerElement) {
         this.subdivisions = state.subdivisions;
     }
 
+    loadSamples() {
+        var activeSampleSet = store.getState().activeSampleSet;
+        var sampleSet = store.getState().sampleSets[activeSampleSet].samples;
+
+        Object.keys(sampleSet).forEach(function (sampleKey) {
+            var samplePath = sampleSet[sampleKey].path;
+
+            // Load the sound and decode it into the buffer
+            fetch(samplePath)
+                .then(response => response.arrayBuffer())
+                .then(audioData => this.audioContext.decodeAudioData(audioData, decoded => this.sampleBuffers[sampleKey] = decoded));
+        }.bind(this));
+    }
+
     _scheduler() {
         if (!this.playNextNotesAt)
             this.playNextNotesAt = this.audioContext.currentTime;
 
         while (this.playNextNotesAt < (this.audioContext.currentTime + .1)) {
-            if (this.tracks[0].pattern[this.nextSubdivToPlay])
-                this._playNote(this.buffer1, this.playNextNotesAt);
+            for (var i = 0; i < this.tracks.length; i++) {
+                if (this.tracks[i].pattern[this.nextSubdivToPlay])
+                    this._playNote(this.sampleBuffers[this.tracks[i].sample], this.playNextNotesAt);
+            }
 
             this.lastNotesScheduledAt = this.playNextNotesAt;
             this.lastSubdivScheduled = this.nextSubdivToPlay;
