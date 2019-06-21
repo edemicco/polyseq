@@ -8,19 +8,19 @@ var initialState = {
     activeSubdiv: 0,
     bpm:          80,
     beats:        4,
-    subdivisions: 2,
+    subdivisions: 4,
     tracks:       [
         {
             sample: 'closedHat',
-            pattern: [true, false, true, false, true, false, true, false]
+            pattern: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]
         },
         {
             sample: 'snare',
-            pattern: [false, false, true, false, false, false, true, false]
+            pattern: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false]
         },
         {
             sample: 'kick',
-            pattern: [true, false, false, false, true, false, false, false]
+            pattern: [true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false]
         }
     ],
     activeSampleSet: "acousticKit",
@@ -124,6 +124,16 @@ function appReducer (state = initialState, action) {
             return {
                 ...state,
                 activeSubdiv: action.subdivision
+            }
+
+        case reduxActions.SELECT_SAMPLE:
+            var newTracks = state.tracks.slice(0);
+
+            newTracks[action.track].sample = action.sample;
+
+            return {
+                ...state,
+                tracks: newTracks
             }
     }
 

@@ -20,6 +20,10 @@ class PolyseqGrid extends connect(store)(PolymerElement){
             localTracks: {
                 type: Array,
                 computed: 'createLocalTrackArray(tracks, activeSubdiv, playing)'
+            },
+            sampleSet: {
+                type: Array,
+                computed: 'createLocalSampleSet(sampleSets, activeSampleSet)'
             }
         }
         ;
@@ -35,12 +39,6 @@ class PolyseqGrid extends connect(store)(PolymerElement){
               :host {
                 display: block;
                 margin: 1rem;
-              }
-              
-              .sample-name {
-                display: inline-block;
-                width: 4rem;
-                text-align: right;
               }
               
               .subdivision-box {
@@ -59,7 +57,11 @@ class PolyseqGrid extends connect(store)(PolymerElement){
             
             <template is='dom-repeat' items="{{localTracks}}" index-as="tracksIdx">
                 <div>
-                    <span class="sample-name">{{item.sample}}</span>
+                    <select on-change="selectSample">
+                        <template is='dom-repeat' items="{{sampleSet}}" as="sample">
+                            <option value="{{sample.id}}" selected="{{getSelectedSample(sample.id, item.sample)}}">{{sample.name}}</option>
+                        </template>                     
+                    </select>
                     <template is='dom-repeat' items="{{item.pattern}}" as="subdiv">
                         <span class$="subdivision-box [[getCssClass(subdiv)]]">
                             <mwc-checkbox checked="{{subdiv.play}}" value='{{tracksIdx}}:{{index}}' on-click="selectSubdivision"></mwc-checkbox>
@@ -76,6 +78,8 @@ class PolyseqGrid extends connect(store)(PolymerElement){
         this.tracks = state.tracks;
         this.activeSubdiv = state.activeSubdiv;
         this.playing = state.playing;
+        this.sampleSets = state.sampleSets;
+        this.activeSampleSet = state.activeSampleSet;
     }
 
     createLocalTrackArray(tracks, activeSubdiv, playing) {
@@ -89,8 +93,19 @@ class PolyseqGrid extends connect(store)(PolymerElement){
 
     }
 
+    createLocalSampleSet(sampleSets, activeSampleSet) {
+        var sampleMap = sampleSets[activeSampleSet].samples;
+
+        return Object.keys(sampleMap).map(key=>({id: key, name: sampleMap[key].name}));
+    }
+
     getCssClass(subdiv) {
         return (subdiv.play ? 'selected' : '') + (this.playing && subdiv.active ? ' active' : '');
+    }
+
+    // TODO: Is there a generic way to check for equality in the template?
+    getSelectedSample(sampleId, trackSampleId) {
+        return sampleId === trackSampleId;
     }
 
     selectSubdivision(event) {
@@ -103,6 +118,14 @@ class PolyseqGrid extends connect(store)(PolymerElement){
             trackNumber: track,
             subdivision: subdivision
         })
+    }
+
+    selectSample(event) {
+        store.dispatch({
+            type: reduxActions.SELECT_SAMPLE,
+            track: event.model.tracksIdx,
+            sample: event.target.value
+        });
     }
 
     addTrack() {
