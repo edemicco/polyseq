@@ -22,7 +22,7 @@ class SoundGenerator extends connect(store)(PolymerElement) {
         this.lastNotesScheduledAt = 0; // The time, based on the audioContext's currentTime, the last note was played.
         this.lastSubdivScheduledAt = 0; // The last subdivision we scheduled to play, so we can update the UI when it's time comes.
         this.playNextNotesAt = 0; // The time, based on the audioContext's currentTime, to play the next note.
-        this.uiNeedsUpdate = false;
+        this.uiUpdatePending = false;
 
         this.sampleBuffers = {};
         this.loadSamples();
@@ -71,7 +71,7 @@ class SoundGenerator extends connect(store)(PolymerElement) {
         if (!this.playNextNotesAt)
             this.playNextNotesAt = this.audioContext.currentTime;
 
-        while (this.playNextNotesAt < (this.audioContext.currentTime + .1)) {
+        while (this.playNextNotesAt < (this.audioContext.currentTime + .01)) {
             for (var i = 0; i < this.tracks.length; i++) {
                 if (this.tracks[i].pattern[this.nextSubdivToPlay])
                     this._playNote(this.sampleBuffers[this.tracks[i].sample], this.playNextNotesAt);
@@ -79,14 +79,15 @@ class SoundGenerator extends connect(store)(PolymerElement) {
 
             this.lastNotesScheduledAt = this.playNextNotesAt;
             this.lastSubdivScheduled = this.nextSubdivToPlay;
-            this.uiNeedsUpdate = true;
+            this.uiUpdatePending = true;
             this._advanceInSequence();
         }
 
         // update the current subdivision in the UI, if the time is ready and we haven't done it yet.
-        if (this.audioContext.currentTime >= this.lastNotesScheduledAt && this.uiNeedsUpdate) {
+        if (this.audioContext.currentTime >= this.lastNotesScheduledAt && this.uiUpdatePending) {
+            console.log('needs to update');
             store.dispatch({type: reduxActions.UPDATE_SUBDIVISION, subdivision: this.lastSubdivScheduled});
-            this.uiNeedsUpdate = false;
+            this.uiUpdatePending = false;
         }
 
         this._runScheduler = requestAnimationFrame(this._scheduler.bind(this));

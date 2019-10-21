@@ -124,7 +124,7 @@ function appReducer (state = initialState, action) {
             return {
                 ...state,
                 activeSubdiv: action.subdivision
-            }
+            };
 
         case reduxActions.SELECT_SAMPLE:
             var newTracks = state.tracks.slice(0);
@@ -134,7 +134,13 @@ function appReducer (state = initialState, action) {
             return {
                 ...state,
                 tracks: newTracks
-            }
+            };
+
+        case reduxActions.SET_BPM:
+            return {
+                ...state,
+                bpm: action.bpm
+            };
     }
 
     return state

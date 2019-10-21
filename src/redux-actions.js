@@ -3,7 +3,8 @@ var reduxActions = {
     TOGGLE_SUBDIVISION:     'TOGGLE_SUBDIVISION',
     TOGGLE_PLAYBACK:        'TOGGLE_PLAYBACK',
     UPDATE_SUBDIVISION:     'UPDATE_SUBDIVISION',
-    SELECT_SAMPLE:          'SELECT_SAMPLE'
+    SELECT_SAMPLE:          'SELECT_SAMPLE',
+    SET_BPM:                'SET_BPM'
 };
 
 export {reduxActions}

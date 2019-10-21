@@ -33,11 +33,17 @@ class PlayControls extends connect(store)(PolymerElement){
             </style>
             
             <button on-click="togglePlayback">{{playStopButtonLabel}}</button>
+            
+            <label>
+                BPM
+                <input type="number" value="{{bpm}}" on-change="updateBpm">
+            </label>
         `;
     }
 
     _stateChanged(state) {
         this.playing = state.playing;
+        this.bpm = state.bpm;
     }
 
     getPlayStopButtonLabel(playing) {
@@ -47,6 +53,13 @@ class PlayControls extends connect(store)(PolymerElement){
     togglePlayback() {
         store.dispatch({
             type: reduxActions.TOGGLE_PLAYBACK,
+        })
+    }
+
+    updateBpm(event) {
+        store.dispatch({
+            type: reduxActions.SET_BPM,
+            bpm: parseInt(event.currentTarget.value)
         })
     }
 }
